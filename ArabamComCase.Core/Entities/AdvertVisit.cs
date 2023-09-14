@@ -8,6 +8,8 @@ namespace ArabamComCase.Core.Entities
 {
     public class AdvertVisit
     {
+        public int Id { get; set; }
+
         public int AdvertId { get; set; }
 
         public string? IpAdress { get; set; }
