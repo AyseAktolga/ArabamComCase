@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArabamComCase.Application.Repositories
+namespace ArabamComCase.Application.Interfaces
 {
-    public interface IAdvertRepository : IRepository<Advert>
+    public interface IAdvertVisitRepository : IRepository<AdvertVisit>
     {
     }
 }
