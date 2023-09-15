@@ -1,4 +1,5 @@
 ﻿using ArabamComCase.Core.Entities;
+using ArabamComCase.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace ArabamComCase.Application.Interfaces
 {
     public interface IAdvertRepository : IRepository<Advert>
     {
+        Task<AdvertGetAllDto> GetAllDtoAsync();
     }
 }

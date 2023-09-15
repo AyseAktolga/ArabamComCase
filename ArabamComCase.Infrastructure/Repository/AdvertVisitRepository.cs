@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ArabamComCase.Application.Interfaces;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 
 namespace ArabamComCase.Infrastructure.Repository
 {
@@ -18,14 +19,16 @@ namespace ArabamComCase.Infrastructure.Repository
         #region ===[ Private Members ]=============================================================
 
         private readonly IConfiguration configuration;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         #endregion
 
         #region ===[ Constructor ]=================================================================
 
-        public AdvertVisitRepository(IConfiguration configuration)
+        public AdvertVisitRepository(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             this.configuration = configuration;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         #endregion
@@ -54,6 +57,8 @@ namespace ArabamComCase.Infrastructure.Repository
 
         public async Task<string> AddAsync(AdvertVisit entity)
         {
+            entity.IpAdress = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+            entity.VisitDate = DateTime.Now;
             using (IDbConnection connection = new SqlConnection(configuration.GetConnectionString("DBConnection")))
             {
                 connection.Open();

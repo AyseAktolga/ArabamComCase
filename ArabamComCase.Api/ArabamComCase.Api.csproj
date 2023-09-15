@@ -13,4 +13,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ArabamComCase.Application\ArabamComCase.Application.csproj" />
+    <ProjectReference Include="..\ArabamComCase.Infrastructure\ArabamComCase.Infrastructure.csproj" />
+    <ProjectReference Include="..\ArabamComCase.Logging\ArabamComCase.Logging.csproj" />
+  </ItemGroup>
+
 </Project>

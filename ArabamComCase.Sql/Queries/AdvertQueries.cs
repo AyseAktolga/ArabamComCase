@@ -12,7 +12,7 @@ namespace ArabamComCase.Sql.Queries
     {
         public static string AllAdvert => "SELECT * FROM [Adverts] (NOLOCK)";
 
-        public static string AdvertById => "SELECT * FROM [Adverts] (NOLOCK) WHERE [Id] = @Id";
+        public static string AdvertById => "SELECT * FROM [Adverts] (NOLOCK) WHERE [id] = @Id";
 
         public static string AddAdvert =>
             @"";
@@ -21,5 +21,7 @@ namespace ArabamComCase.Sql.Queries
             @"";
 
         public static string DeleteAdvert => "DELETE FROM [Adverts] WHERE [Id] = @Id";
+
+        public static string AllAdvertDto => "SELECT  id,ModelName,Year,Price,Title,Date,CategoryId,Category,Km,Color,Gear,Fuel,FirstPhoto FROM [Adverts] (NOLOCK)";
     }
 }

@@ -10,6 +10,8 @@ using ArabamComCase.Application.Interfaces;
 using ArabamComCase.Sql.Queries;
 using Dapper;
 using ArabamComCase.Core.Entities;
+using ArabamComCase.Core.Models;
+using ArabamComCase.Core.DTOs;
 
 namespace ArabamComCase.Infrastructure.Repository
 {
@@ -79,6 +81,18 @@ namespace ArabamComCase.Infrastructure.Repository
                 connection.Open();
                 var result = await connection.ExecuteAsync(AdvertQueries.DeleteAdvert, new { Id = id });
                 return result.ToString();
+            }
+        }
+
+        public async Task<AdvertGetAllDto> GetAllDtoAsync()
+        {
+            using (IDbConnection connection = new SqlConnection(configuration.GetConnectionString("DBConnection")))
+            {
+                connection.Open();
+                var result = await connection.QueryAsync<AdvertDto>(AdvertQueries.AllAdvertDto);
+                var advertGetAllDto = new AdvertGetAllDto();
+                advertGetAllDto.Adverts = result.ToList();
+                return advertGetAllDto;
             }
         }
 

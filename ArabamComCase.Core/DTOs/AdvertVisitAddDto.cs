@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArabamComCase.Core.Entities
+namespace ArabamComCase.Core.Models
 {
-    public class AdvertVisit
+    public class AdvertVisitAddDto
     {
         public int AdvertId { get; set; }
-
-        public string? IpAdress { get; set; }
-
-        public DateTime VisitDate { get; set; }
     }
 }
