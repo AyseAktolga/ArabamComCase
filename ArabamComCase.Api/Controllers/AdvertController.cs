@@ -17,9 +17,9 @@ namespace ArabamComCase.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<AdvertGetAllDto> All()
+        public async Task<AdvertGetAllDto> All(AdvertGetAllParameterDto advertGetAllParameterDto)
         {
-            var result = await _unitOfWork.Adverts.GetAllDtoAsync();
+            var result = await _unitOfWork.Adverts.GetAllDtoAsync(advertGetAllParameterDto);
             return result;
         }
 

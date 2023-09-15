@@ -10,6 +10,6 @@ namespace ArabamComCase.Application.Interfaces
 {
     public interface IAdvertRepository : IRepository<Advert>
     {
-        Task<AdvertGetAllDto> GetAllDtoAsync();
+        Task<AdvertGetAllDto> GetAllDtoAsync(AdvertGetAllParameterDto advertGetAllParameterDto);
     }
 }
