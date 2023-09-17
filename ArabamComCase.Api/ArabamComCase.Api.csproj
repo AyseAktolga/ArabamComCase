@@ -19,5 +19,9 @@
     <ProjectReference Include="..\ArabamComCase.Infrastructure\ArabamComCase.Infrastructure.csproj" />
     <ProjectReference Include="..\ArabamComCase.Logging\ArabamComCase.Logging.csproj" />
   </ItemGroup>
-
+	<ItemGroup>
+		<Content Update="log4net.config">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

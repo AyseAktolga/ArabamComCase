@@ -55,13 +55,13 @@ namespace ArabamComCase.Infrastructure.Repository
             }
         }
 
-        public async Task<string> AddAsync(Advert entity)
+        public async Task<Advert> AddAsync(Advert entity)
         {
             using (IDbConnection connection = new SqlConnection(configuration.GetConnectionString("DBConnection")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(AdvertQueries.AddAdvert, entity);
-                return result.ToString();
+                return entity;
             }
         }
 

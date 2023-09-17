@@ -1,7 +1,8 @@
 using ArabamComCase.Infrastructure;
+using log4net.Config;
 
 var builder = WebApplication.CreateBuilder(args);
-
+XmlConfigurator.Configure(new FileInfo("log4net.config"));
 // Add services to the container.
 
 builder.Services.RegisterServices();

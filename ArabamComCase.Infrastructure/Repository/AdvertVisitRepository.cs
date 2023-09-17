@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Http;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Collections;
-
+using System.Text.Json;
 
 namespace ArabamComCase.Infrastructure.Repository
 {
@@ -59,11 +59,20 @@ namespace ArabamComCase.Infrastructure.Repository
             }
         }
 
-        public async Task<string> AddAsync(AdvertVisit entity)
+        public async Task<AdvertVisit> AddAsync(AdvertVisit entity)
         {
-            int result = 0;
+            AdvertVisitProducer(entity);
+            Thread.Sleep(1000);
+            AdvertVisitConsumer();
+            Thread.Sleep(1000);
+            return entity;
+        }
 
-            new Thread(async () =>
+        public bool AdvertVisitProducer(AdvertVisit entity)
+        {
+            entity.IpAdress = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+            entity.VisitDate = DateTime.Now;
+            try
             {
                 var connectionFactory = new ConnectionFactory()
                 {
@@ -71,31 +80,86 @@ namespace ArabamComCase.Infrastructure.Repository
                     UserName = "guest",
                     Password = "guest",
                 };
-                using (var connection = connectionFactory.CreateConnection())
-                {
-                    var channel = connection.CreateModel();
 
-                    channel.QueueDeclare(queue: "AdvertVisit", durable: false, exclusive: false, autoDelete: false);
+                using (var connection = connectionFactory.CreateConnection())
+                using (var channel = connection.CreateModel())
+                {
+                    channel.QueueDeclare(queue: "AdvertVisit",
+                                         durable: false,
+                                         exclusive: false,
+                                         autoDelete: false,
+                                         arguments: null);
+
+                    string logMessageJson = JsonSerializer.Serialize(entity);
+
+                    var body = Encoding.UTF8.GetBytes(logMessageJson);
+
+                    channel.BasicPublish(exchange: "",
+                                         routingKey: "AdvertVisit",
+                                         basicProperties: null,
+                                         body: body);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return true;
+        }
+
+
+        public bool AdvertVisitConsumer()
+        {
+
+            try
+            {
+                var factory = new ConnectionFactory()
+                {
+                    HostName = "rabbitmq",
+                    UserName = "guest",
+                    Password = "guest",
+                };
+
+                using (IConnection connection = factory.CreateConnection())
+                using (IModel channel = connection.CreateModel())
+                {
+                    channel.QueueDeclare(queue: "AdvertVisit",
+                                         durable: false,
+                                         exclusive: false,
+                                         autoDelete: false,
+                                         arguments: null);
 
                     var consumer = new EventingBasicConsumer(channel);
 
-                    channel.BasicConsume(queue: "AdvertVisit", autoAck: false, consumer: consumer);
+                   consumer.Received += (model, mq) =>
+                    {                      
+                        var body = mq.Body.ToArray();
+                        var logMessageString = Encoding.UTF8.GetString(body);
+                        Console.WriteLine($"Log message received: {logMessageString}");
+
+                        var logMessage = JsonSerializer.Deserialize<AdvertVisit>(logMessageString);
+
+                        using (IDbConnection connection2 = new SqlConnection(configuration.GetConnectionString("DBConnection")))
+                        {
+                            connection2.Open();
+                            connection2.ExecuteAsync(AdvertVisitQueries.AddAdvertVisit, logMessage).Wait();
+                        }
+
+                    };
+
+                    channel.BasicConsume(queue: "AdvertVisit",
+                                         autoAck: true,
+                                         consumer: consumer);
                 }
 
-
-                entity.IpAdress = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
-                entity.VisitDate = DateTime.Now;
-
-                using (IDbConnection connection = new SqlConnection(configuration.GetConnectionString("DBConnection")))
-                {
-                    connection.Open();
-                    result = await connection.ExecuteAsync(AdvertVisitQueries.AddAdvertVisit, entity);
-                }
-
-            }).Start();
-
-            return result.ToString();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return true;
         }
+
 
         public async Task<string> UpdateAsync(AdvertVisit entity)
         {
