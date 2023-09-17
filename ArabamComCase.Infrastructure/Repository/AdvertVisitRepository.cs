@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 using ArabamComCase.Application.Interfaces;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Collections;
+
 
 namespace ArabamComCase.Infrastructure.Repository
 {
@@ -57,14 +61,40 @@ namespace ArabamComCase.Infrastructure.Repository
 
         public async Task<string> AddAsync(AdvertVisit entity)
         {
-            entity.IpAdress = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
-            entity.VisitDate = DateTime.Now;
-            using (IDbConnection connection = new SqlConnection(configuration.GetConnectionString("DBConnection")))
+            int result = 0;
+
+            new Thread(async () =>
             {
-                connection.Open();
-                var result = await connection.ExecuteAsync(AdvertVisitQueries.AddAdvertVisit, entity);
-                return result.ToString();
-            }
+                var connectionFactory = new ConnectionFactory()
+                {
+                    HostName = "rabbitmq",
+                    UserName = "guest",
+                    Password = "guest",
+                };
+                using (var connection = connectionFactory.CreateConnection())
+                {
+                    var channel = connection.CreateModel();
+
+                    channel.QueueDeclare(queue: "AdvertVisit", durable: false, exclusive: false, autoDelete: false);
+
+                    var consumer = new EventingBasicConsumer(channel);
+
+                    channel.BasicConsume(queue: "AdvertVisit", autoAck: false, consumer: consumer);
+                }
+
+
+                entity.IpAdress = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+                entity.VisitDate = DateTime.Now;
+
+                using (IDbConnection connection = new SqlConnection(configuration.GetConnectionString("DBConnection")))
+                {
+                    connection.Open();
+                    result = await connection.ExecuteAsync(AdvertVisitQueries.AddAdvertVisit, entity);
+                }
+
+            }).Start();
+
+            return result.ToString();
         }
 
         public async Task<string> UpdateAsync(AdvertVisit entity)

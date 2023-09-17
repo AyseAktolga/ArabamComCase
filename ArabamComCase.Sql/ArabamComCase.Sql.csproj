@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <Folder Include="Scripts\" />
+    <Folder Include="Scripts\Datas\" />
+    <Folder Include="Scripts\Tables\" />
   </ItemGroup>
 
 </Project>

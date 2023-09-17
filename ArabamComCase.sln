@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArabamComCase.Sql", "Arabam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArabamComCase.Infrastructure", "ArabamComCase.Infrastructure\ArabamComCase.Infrastructure.csproj", "{D8A27811-E2B5-4421-B8F3-0EEEEDCEA34F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArabamComCase.Api", "ArabamComCase.Api\ArabamComCase.Api.csproj", "{B2A6FB61-ABAE-4ED3-9D33-BA29ABE4AA28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArabamComCase.Api", "ArabamComCase.Api\ArabamComCase.Api.csproj", "{B2A6FB61-ABAE-4ED3-9D33-BA29ABE4AA28}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{8568F86C-0DA3-4144-BBF2-4E869366404E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{B2A6FB61-ABAE-4ED3-9D33-BA29ABE4AA28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2A6FB61-ABAE-4ED3-9D33-BA29ABE4AA28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2A6FB61-ABAE-4ED3-9D33-BA29ABE4AA28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8568F86C-0DA3-4144-BBF2-4E869366404E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8568F86C-0DA3-4144-BBF2-4E869366404E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8568F86C-0DA3-4144-BBF2-4E869366404E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8568F86C-0DA3-4144-BBF2-4E869366404E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

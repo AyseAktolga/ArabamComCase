@@ -1,0 +1,4 @@
+DROP DATABASE ArabamComCaseDB
+
+CREATE DATABASE ArabamComCaseDB COLLATE Turkish_CI_AS;
+GO

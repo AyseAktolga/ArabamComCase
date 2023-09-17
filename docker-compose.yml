@@ -1,0 +1,40 @@
+version: '3.4'
+
+services:
+  arabamcomcase.api:
+    image: ${DOCKER_REGISTRY-}arabamcomcaseapi
+    build:
+      context: .
+      dockerfile: ArabamComCase.Api/Dockerfile
+
+  mssqldata:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    entrypoint: /bin/bash
+
+  mssql:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    ports:
+      - 1433:1433
+    volumes:
+      - /var/opt/mssql
+      # we copy our scripts onto the container
+      - ./ArabamComCase.Sql/Scripts:/usr/src/app 
+    # bash will be executed from that path, our scripts folder
+    working_dir: /usr/src/app 
+    # run the entrypoint.sh that will import the data AND sqlserver
+    command: sh -c 'sh entrypoint.sh & /opt/mssql/bin/sqlservr;'
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: P@55w0rd
+    # don't use this if you don't want to persit data between docker up and down
+    volumes_from:
+      - mssqldata
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
