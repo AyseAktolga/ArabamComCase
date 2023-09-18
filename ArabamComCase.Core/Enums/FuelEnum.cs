@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ArabamComCase.Core.Enums
 {
     public enum FuelEnum
     {
-        All,
+        [Display(Name = "Dizel")]
         Diesel,
-        LPG,
-        Gas
+        [Display(Name = "LPG & Benzin")]
+        Gas,
+        [Display(Name = "Benzin")]
+        Benzin
     }
 }

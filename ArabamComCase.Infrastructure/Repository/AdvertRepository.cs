@@ -1,18 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ArabamComCase.Application.Interfaces;
-using ArabamComCase.Sql.Queries;
-using Dapper;
+﻿using ArabamComCase.Application.Interfaces;
+using ArabamComCase.Core.DTOs;
 using ArabamComCase.Core.Entities;
 using ArabamComCase.Core.Models;
-using ArabamComCase.Core.DTOs;
-using ArabamComCase.Core.Enums;
+using ArabamComCase.Sql.Queries;
+using Dapper;
+using Mapster;
+using Microsoft.Extensions.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace ArabamComCase.Infrastructure.Repository
 {
@@ -85,81 +80,36 @@ namespace ArabamComCase.Infrastructure.Repository
             }
         }
 
-        public async Task<AdvertGetAllDto> GetAllDtoAsync(AdvertGetAllParameterDto parameter)
+        public async Task<AdvertGetAllDto> GetAllDtoAsync(AdvertGetAllParameterDto advertGetAllParameterDto)
         {
+            AdvertGetAllDto advertGetAllDto = new AdvertGetAllDto();
             using (IDbConnection connection = new SqlConnection(configuration.GetConnectionString("DBConnection")))
             {
                 connection.Open();
-                var result = await connection.QueryAsync<AdvertDto>(AdvertQueries.AllAdvertDto);
-                var advertGetAllDto = new AdvertGetAllDto();
-                advertGetAllDto.Adverts = result.ToList();
-                advertGetAllDto.Total = advertGetAllDto.Adverts.Count();
-                advertGetAllDto.Page = parameter.PageNumber;
-                var adverts = advertGetAllDto.Adverts;
 
-                if (parameter.CategoryId != 0)
-                {
-                    adverts = adverts.Where(x => x.CategoryId == parameter.CategoryId).ToList();
-                }
-                if (parameter.PriceMin != 0 && parameter.PriceMax != 0)
-                {
-                    adverts = adverts.Where(x => x.Price >= parameter.PriceMin && x.Price <= parameter.PriceMax).ToList();
-                }
-                else if (parameter.PriceMin != 0)
-                {
-                    adverts = adverts.Where(x => x.Price >= parameter.PriceMin).ToList();
-                }
-                else if (parameter.PriceMax != 0)
-                {
-                    adverts = adverts.Where(x => x.Price <= parameter.PriceMax).ToList();
-                }
-                if (parameter.GearEnum != GearEnum.All)
-                {
-                    adverts = adverts.Where(x => x.Gear == parameter.GearEnum.ToString()).ToList();
-                }
-                if (parameter.GearEnum != GearEnum.All)
-                {
-                    adverts = adverts.Where(x => x.Gear == parameter.GearEnum.ToString()).ToList();
-                }
-                if (parameter.AdvertSorting != AdvertSorting.NoSorting)
-                {
-                    if (parameter.AdvertSorting == AdvertSorting.KmLowToHigh)
-                    {
-                        adverts = adverts.OrderBy(x => x.Km).ToList();
-                    }
-                    if (parameter.AdvertSorting == AdvertSorting.KmHighToLow)
-                    {
-                        adverts = adverts.OrderByDescending(x => x.Km).ToList() ;
-                    }
-                    if (parameter.AdvertSorting == AdvertSorting.PriceLowToHigh)
-                    {
-                        adverts = adverts.OrderBy(x => x.Price).ToList()    ;
-                    }
-                    if (parameter.AdvertSorting == AdvertSorting.PriceHighToLow)
-                    {
-                        adverts = adverts.OrderByDescending(x => x.Price).ToList()  ;
-                    }
-                    if (parameter.AdvertSorting == AdvertSorting.YearLowToHigh)
-                    {
-                        adverts = adverts.OrderBy(x => x.Year).ToList();
-                    }
-                    if (parameter.AdvertSorting == AdvertSorting.YearHighToLow)
-                    {
-                        adverts = adverts.OrderByDescending(x => x.Year).ToList();
-                    }
-                }
+                DynamicParameters parameter2 = new DynamicParameters();
 
-                if(parameter.PageNumber == 0 && parameter.PageSize == 0)
-                {
-                    advertGetAllDto.Adverts = adverts;
-                }
-                else
-                {
-                    advertGetAllDto.Adverts = adverts.Skip((parameter.PageNumber - 1) * parameter.PageSize).Take(parameter.PageSize).ToList();
-                }
+                parameter2.Add("@CategoryId", advertGetAllParameterDto.CategoryId);
+                parameter2.Add("@PriceMin", advertGetAllParameterDto.PriceMin);
+                parameter2.Add("@PriceMax", advertGetAllParameterDto.PriceMax);
+                parameter2.Add("@Gear", advertGetAllParameterDto?.Gear);
+                parameter2.Add("@Fuel", advertGetAllParameterDto?.Fuel);
+                parameter2.Add("@Page", advertGetAllParameterDto.Page);
+                parameter2.Add("@PageSize", advertGetAllParameterDto.PageSize);
+                parameter2.Add("@SortingColumn", advertGetAllParameterDto?.SortingColumn);
+                parameter2.Add("@SortingOrder", advertGetAllParameterDto?.SortingOrder);
+                //parameter2.Add("@TotalCount", dbType: DbType.Int32, direction:ParameterDirection.Output);
 
-                return advertGetAllDto;
+                var result = await connection.QueryAsync<Advert>("dbo.GetFilteredAndSortedCarsWithPaging", parameter2, commandType: CommandType.StoredProcedure);
+                if (result.Any())
+                {
+                    advertGetAllDto.Total = result.FirstOrDefault().TotalCount;
+                    advertGetAllDto.Page = advertGetAllParameterDto.Page;
+                    advertGetAllDto.Adverts = new List<AdvertDto>();
+                    advertGetAllDto.Adverts = result.Select(source => source.Adapt<AdvertDto>()).ToList();
+                }
             }
+            return advertGetAllDto;
         }
 
         #endregion

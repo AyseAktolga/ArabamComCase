@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ArabamComCase.Core.Entities
+﻿namespace ArabamComCase.Core.Entities
 {
     public class Advert
     {
@@ -53,5 +47,6 @@ namespace ArabamComCase.Core.Entities
         public string? UserPhone { get; set; }
 
         public string? Text { get; set; }
+        public int TotalCount { get; set; }
     }
 }

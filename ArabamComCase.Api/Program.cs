@@ -7,6 +7,7 @@ XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
 builder.Services.RegisterServices();
 builder.Services.AddControllers();
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
@@ -24,8 +25,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
 app.UseAuthorization();
+app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
-app.MapControllers();
 
 app.Run();

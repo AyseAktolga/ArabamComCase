@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ArabamComCase.Core.Enums
 {
     public enum GearEnum
     {
-        All,
+        [Display(Name = "Düz")]
         Manual,
+        [Display(Name = "Yarı Otomatik")]
         SemiAutomatic,
+        [Display(Name = "Otomatik")]
         Automatic
     }
 }

@@ -1,19 +1,14 @@
-﻿using ArabamComCase.Core.Entities;
+﻿using ArabamComCase.Application.Interfaces;
+using ArabamComCase.Core.Entities;
 using ArabamComCase.Sql.Queries;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ArabamComCase.Application.Interfaces;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Collections;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text;
 using System.Text.Json;
 
 namespace ArabamComCase.Infrastructure.Repository
@@ -131,21 +126,21 @@ namespace ArabamComCase.Infrastructure.Repository
 
                     var consumer = new EventingBasicConsumer(channel);
 
-                   consumer.Received += (model, mq) =>
-                    {                      
-                        var body = mq.Body.ToArray();
-                        var logMessageString = Encoding.UTF8.GetString(body);
-                        Console.WriteLine($"Log message received: {logMessageString}");
+                    consumer.Received += (model, mq) =>
+                     {
+                         var body = mq.Body.ToArray();
+                         var logMessageString = Encoding.UTF8.GetString(body);
+                         Console.WriteLine($"Log message received: {logMessageString}");
 
-                        var logMessage = JsonSerializer.Deserialize<AdvertVisit>(logMessageString);
+                         var logMessage = JsonSerializer.Deserialize<AdvertVisit>(logMessageString);
 
-                        using (IDbConnection connection2 = new SqlConnection(configuration.GetConnectionString("DBConnection")))
-                        {
-                            connection2.Open();
-                            connection2.ExecuteAsync(AdvertVisitQueries.AddAdvertVisit, logMessage).Wait();
-                        }
+                         using (IDbConnection connection2 = new SqlConnection(configuration.GetConnectionString("DBConnection")))
+                         {
+                             connection2.Open();
+                             connection2.ExecuteAsync(AdvertVisitQueries.AddAdvertVisit, logMessage).Wait();
+                         }
 
-                    };
+                     };
 
                     channel.BasicConsume(queue: "AdvertVisit",
                                          autoAck: true,
